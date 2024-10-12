@@ -11,36 +11,59 @@
       @createFolder="createFolder"
     ></UploadPopup>
     <button class="upload-button circle" @click="showUploadPopup = true">
-      <img
-        style="filter: invert(100%)"
-        src="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/4.0.0/png/file/upload_file/materialicons/36dp/2x/baseline_upload_file_black_36dp.png"
-        alt="Upload"
-        width="36"
-        height="36"
+      <svg
+        viewBox="0 0 1024 1024"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        width="33"
+        height="33"
         @contextmenu.prevent
-      />
+      >
+        <path
+          d="M811.1616 393.3184c-5.2736-160.6656-137.0624-289.28-299.008-289.28s-293.7344 128.6144-299.008 289.28c-100.9152 3.328-181.7088 86.1184-181.7088 187.8528 0 103.8336 84.1728 188.0064 188.0064 188.0064h585.3696c103.8336 0 188.0064-84.1728 188.0064-188.0064 0.0512-101.7344-80.7424-184.5248-181.6576-187.8528z"
+          fill="#80B7F9"
+        ></path>
+        <path
+          d="M652.8 481.2288l-117.8112-91.4432a40.4224 40.4224 0 0 0-51.2-0.0512L371.5584 481.28c-17.3056 14.1312-19.9168 39.5776-5.7856 56.8832a40.45824 40.45824 0 0 0 56.8832 5.7856l48.9984-39.9872v381.0304c0 22.3232 18.1248 40.448 40.448 40.448s40.448-18.1248 40.448-40.448V508.7744l48.896 34.9696a40.37632 40.37632 0 0 0 25.6 9.1648c11.7248 0 23.296-5.0688 31.2832-14.7968a40.25344 40.25344 0 0 0-5.5296-56.8832z"
+          fill="#80B7F9"
+        ></path>
+        <path
+          d="M552.6016 769.1776V508.7744l48.896 34.9696a40.37632 40.37632 0 0 0 25.6 9.1648c11.7248 0 23.296-5.0688 31.2832-14.7968 14.1824-17.2544 11.6224-42.752-5.632-56.9344l-117.8112-91.4432a40.4224 40.4224 0 0 0-51.2-0.0512L371.5584 481.28c-17.3056 14.1312-19.9168 39.5776-5.7856 56.8832a40.45824 40.45824 0 0 0 56.8832 5.7856l48.9984-39.9872v265.216h80.9472z"
+          fill="#3E8BF8"
+        ></path>
+      </svg>
     </button>
     <div class="app-bar">
-      <input type="search" v-model="search" aria-label="Search" />
+      <input
+        type="search"
+        v-model="search"
+        aria-label="Search"
+        placeholder="输入文件名检索文件"
+      />
       <div class="menu-button">
         <button class="circle" @click="showMenu = true">
           <svg
+            viewBox="0 0 1024 1024"
+            version="1.1"
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 448 512"
-            width="24"
-            height="24"
-            title="Menu"
-            style="display: block; margin: 4px"
+            width="23"
+            height="23"
+            style="margin-left: 8px; margin-right: 5px"
           >
-            <!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
             <path
-              d="M120 256c0 30.9-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56s56 25.1 56 56zm160 0c0 30.9-25.1 56-56 56s-56-25.1-56-56s25.1-56 56-56s56 25.1 56 56zm104 56c-30.9 0-56-25.1-56-56s25.1-56 56-56s56 25.1 56 56s-25.1 56-56 56z"
-            />
+              d="M957.397333 479.744L1024 563.370667v0.085333L888.96 768 810.666667 726.186667V42.666667h90.026666v523.093333l56.704-86.016zM554.666667 554.837333v-85.333333H0v85.333333h554.666667zM1024 981.162667v-85.333334H0v85.333334h1024zM554.666667 128V42.666667H0v85.333333h554.666667z"
+              fill="#000000"
+            ></path>
           </svg>
         </button>
         <Menu
           v-model="showMenu"
-          :items="[{ text: '名称A-Z' }, { text: '大小↑' } ,{ text: '大小↓' }, { text: '粘贴' }]"
+          :items="[
+            { text: '名称 A-Z' },
+            { text: '从大到小 ↑' },
+            { text: '从小到大 ↓' },
+            { text: '粘贴' },
+          ]"
           @click="onMenuClick"
         />
       </div>
@@ -50,6 +73,7 @@
         <div
           tabindex="0"
           class="file-item"
+          style="cursor: pointer"
           @click="cwd = cwd.replace(/[^\/]+\/$/, '')"
           @contextmenu.prevent
         >
@@ -61,44 +85,55 @@
               alt="Folder"
             />
           </div>
-          <span class="file-name">..</span>
+          <span class="file-name">返回上一级..</span>
         </div>
       </li>
       <li v-for="folder in filteredFolders" :key="folder">
         <div
           tabindex="0"
           class="file-item"
-          @click="cwd = folder"
           @contextmenu.prevent="
             showContextMenu = true;
             focusedItem = folder;
           "
         >
           <div class="file-icon">
-            <img
-              src="https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/4.0.0/png/file/folder/materialicons/36dp/2x/baseline_folder_black_36dp.png"
-              width="36"
-              height="36"
-              alt="Folder"
-            />
+            <MimeIcon thumbnail="assets/images/file-folder.svg" />
           </div>
           <span
+            @click="cwd = folder"
             class="file-name"
+            style="cursor: pointer"
             v-text="folder.match(/.*?([^/]*)\/?$/)[1]"
           ></span>
-          <div style="margin-right: 10px;margin-left: auto;"
+          <div
+            class="contextmenu-button"
             @click.stop="
               showContextMenu = true;
               focusedItem = folder;
             "
+          >
+            <svg
+              t="1728718960353"
+              class="icon"
+              viewBox="0 0 4096 1024"
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+              p-id="43249"
+              width="20"
+              height="20"
             >
-              <svg viewBox="0 0 24 24" style="height: 30px; width: 30px;"><path fill="currentColor" d="M10.5,12A1.5,1.5 0 0,1 12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12M10.5,16.5A1.5,1.5 0 0,1 12,15A1.5,1.5 0 0,1 13.5,16.5A1.5,1.5 0 0,1 12,18A1.5,1.5 0 0,1 10.5,16.5M10.5,7.5A1.5,1.5 0 0,1 12,6A1.5,1.5 0 0,1 13.5,7.5A1.5,1.5 0 0,1 12,9A1.5,1.5 0 0,1 10.5,7.5M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"></path></svg>
+              <path
+                d="M3245.397333 472.746667c0 232.106667 178.517333 419.84 399.018667 419.84s399.36-187.733333 399.36-419.84c0-232.106667-178.858667-420.181333-399.36-420.181334-220.501333 0-399.36 187.733333-399.36 419.84z m-798.378666 0C2447.36 240.64 2268.501333 52.565333 2048 52.565333s-399.36 187.733333-399.36 419.84c0 232.106667 178.858667 420.181333 399.36 420.181334 220.501333 0 399.36-187.733333 399.36-419.84z m-1596.416 0c0-232.106667-178.517333-420.181333-399.018667-420.181334s-399.36 187.733333-399.36 419.84c0 232.106667 178.858667 420.181333 399.36 420.181334 105.813333 0 207.530667-44.373333 282.282667-122.88 75.093333-78.506667 116.736-185.685333 116.736-296.96z"
+                fill="#000000"
+                p-id="43250"
+              ></path>
+            </svg>
           </div>
         </div>
       </li>
       <li v-for="file in filteredFiles" :key="file.key">
         <div
-          @click="preview(`/raw/${file.key}`)"
           @contextmenu.prevent="
             showContextMenu = true;
             focusedItem = file;
@@ -110,23 +145,41 @@
               :thumbnail="
                 file.customMetadata.thumbnail
                   ? `/raw/_$flaredrive$/thumbnails/${file.customMetadata.thumbnail}.png`
+                  : getFileIcon(file)
+                  ? getFileIcon(file)
                   : null
               "
             />
-            <div>
+            <div style="cursor: pointer" @click="preview(`/raw/${file.key}`)">
               <div class="file-name" v-text="file.key.split('/').pop()"></div>
               <div class="file-attr">
                 <span v-text="new Date(file.uploaded).toLocaleString()"></span>
                 <span v-text="formatSize(file.size)"></span>
               </div>
             </div>
-            <div style="margin-right: 10px;margin-left: auto;"
-            @click.stop="
-              showContextMenu = true;
-              focusedItem = file;
-            "
+            <div
+              class="contextmenu-button"
+              @click.stop="
+                showContextMenu = true;
+                focusedItem = file;
+              "
             >
-              <svg viewBox="0 0 24 24" style="height: 30px; width: 30px;"><path fill="currentColor" d="M10.5,12A1.5,1.5 0 0,1 12,10.5A1.5,1.5 0 0,1 13.5,12A1.5,1.5 0 0,1 12,13.5A1.5,1.5 0 0,1 10.5,12M10.5,16.5A1.5,1.5 0 0,1 12,15A1.5,1.5 0 0,1 13.5,16.5A1.5,1.5 0 0,1 12,18A1.5,1.5 0 0,1 10.5,16.5M10.5,7.5A1.5,1.5 0 0,1 12,6A1.5,1.5 0 0,1 13.5,7.5A1.5,1.5 0 0,1 12,9A1.5,1.5 0 0,1 10.5,7.5M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"></path></svg>
+              <svg
+                t="1728718960353"
+                class="icon"
+                viewBox="0 0 4096 1024"
+                version="1.1"
+                xmlns="http://www.w3.org/2000/svg"
+                p-id="43249"
+                width="20"
+                height="20"
+              >
+                <path
+                  d="M3245.397333 472.746667c0 232.106667 178.517333 419.84 399.018667 419.84s399.36-187.733333 399.36-419.84c0-232.106667-178.858667-420.181333-399.36-420.181334-220.501333 0-399.36 187.733333-399.36 419.84z m-798.378666 0C2447.36 240.64 2268.501333 52.565333 2048 52.565333s-399.36 187.733333-399.36 419.84c0 232.106667 178.858667 420.181333 399.36 420.181334 220.501333 0 399.36-187.733333 399.36-419.84z m-1596.416 0c0-232.106667-178.517333-420.181333-399.018667-420.181334s-399.36 187.733333-399.36 419.84c0 232.106667 178.858667 420.181333 399.36 420.181334 105.813333 0 207.530667-44.373333 282.282667-122.88 75.093333-78.506667 116.736-185.685333 116.736-296.96z"
+                  fill="#333333"
+                  p-id="43250"
+                ></path>
+              </svg>
             </div>
           </div>
         </div>
@@ -137,16 +190,35 @@
     </div>
     <div
       v-else-if="!filteredFiles.length && !filteredFolders.length"
-      style="margin-top: 12px; text-align: center"
+      style="
+        margin-top: 12px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      "
     >
-      <span>没有文件</span>
+      <img width="120" src="assets/images/empty.gif" />
+      <span style="color: #858585; font-size: 13px">空！！！</span>
     </div>
     <Dialog v-model="showContextMenu">
-      <div
-        v-text="focusedItem.key || focusedItem"
-        class="contextmenu-filename"
-        @click.stop.prevent
-      ></div>
+      <div class="focused-item-icon">
+        <img
+          :src="
+            typeof focusedItem === 'string'
+              ? 'assets/images/file-folder.svg'
+              : focusedItem.customMetadata.thumbnail
+              ? `/raw/_$flaredrive$/thumbnails/${focusedItem.customMetadata.thumbnail}.png`
+              : getFileIcon(focusedItem)
+              ? getFileIcon(focusedItem)
+              : null
+          "
+          width="80"
+        />
+        <p style="margin: 0">{{ focusedItem.key || focusedItem }}</p>
+      </div>
+      <div class="contextmenu-filename" @click.stop.prevent>选择操作</div>
       <ul v-if="typeof focusedItem === 'string'" class="contextmenu-list">
         <li>
           <button @click="copyLink(`/?p=${encodeURIComponent(focusedItem)}`)">
@@ -226,9 +298,7 @@ export default {
     filteredFiles() {
       let files = this.files;
       if (this.search) {
-        files = files.filter((file) =>
-          file.key.split("/").pop().includes(this.search)
-        );
+        files = files.filter((file) => file.key.includes(this.search));
       }
       return files;
     },
@@ -247,7 +317,71 @@ export default {
       const url = new URL(link, window.location.origin);
       navigator.clipboard.writeText(url.toString());
     },
-
+    getFileIcon(filtInfo) {
+      const { httpMetadata, key } = filtInfo;
+      let mimeType = httpMetadata.contentType;
+      if (!mimeType) {
+        const TypeMapping = {
+          js: "application/javascript",
+          html: "text/html",
+          css: "text/css",
+          vue: "text/x-vue",
+          java: "application/java-archive",
+          py: "application/x-python-code",
+          c: "text/x-csrc",
+          cpp: "text/x-c++src",
+          xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          zip: "application/zip",
+          apk: "application/vnd.android.package-archive",
+          mp3: "audio/mpeg",
+          avi: "video/x-msvideo",
+          mp4: "video/mp4",
+          flac: "audio/flac",
+        };
+        mimeType = TypeMapping[key.split(".").pop()] ?? mimeType;
+      }
+      switch (mimeType) {
+        case "application/vnd.android.package-archive":
+          return "assets/images/apk.svg"; // 安卓APK图标
+        case "audio/mpeg":
+          return "assets/images/mp3.svg"; // MP3音频图标
+        case "audio/flac":
+          return "assets/images/flac.svg"; // FLAC音频图标
+        case "video/x-msvideo": // AVI视频图标
+        case "video/mp4":
+          return "assets/images/mp4.svg"; // MP4视频图标
+        case "application/javascript":
+          return "assets/images/javascript.svg"; // JavaScript图标
+        case "text/html":
+          return "assets/images/html.svg"; // HTML图标
+        case "text/css":
+          return "assets/images/css.svg"; // CSS图标
+        case "text/x-vue":
+          return "assets/images/vuejs.svg"; // Vue图标
+        case "application/java-archive":
+        case "text/x-java-source":
+          return "assets/images/java.svg"; // Java图标
+        case "application/x-python-code":
+        case "text/x-python":
+          return "assets/images/python.svg"; // Python图标
+        case "text/x-csrc":
+        case "text/x-c++src":
+          return "assets/images/c.svg"; // C/C++图标
+        case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+        case "application/x-cfb":
+          return "assets/images/excel.svg"; // Excel图标路径
+        case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+          return "assets/images/ppt.svg"; // PowerPoint图标路径
+        case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+          return "assets/images/word.svg"; // Word图标路径
+        case "application/zip":
+          return "assets/images/winrar.svg"; // ZIP文件图标路径
+        default:
+          return "assets/images/file.svg";
+      }
+    },
     async copyPaste(source, target) {
       const uploadUrl = `/api/write/items/${target}`;
       await axios.put(uploadUrl, "", {
@@ -345,7 +479,7 @@ export default {
       fileElement.value = null;
     },
 
-    preview(filePath){
+    preview(filePath) {
       window.open(filePath);
     },
 
@@ -420,15 +554,20 @@ export default {
     },
 
     async removeFile(key) {
-      if (!window.confirm(`确定要删除 ${key} 吗？`)) return;
-      await axios.delete(`/api/write/items/${key}`);
-      this.fetchFiles();
+      const DeleteFlag = window.confirm(`确定要删除${key}？`);
+      if (DeleteFlag) {
+        await axios.delete(`/api/write/items/${key}`);
+        this.fetchFiles();
+      }
     },
 
     async renameFile(key) {
-      const newName = window.prompt("重命名为:");
+      const fileSplit = key.split(".");
+      const fileType = fileSplit.pop();
+      const fileName = fileSplit.join(".");
+      const newName = window.prompt("重命名为:", fileName);
       if (!newName) return;
-      await this.copyPaste(key, `${this.cwd}${newName}`);
+      await this.copyPaste(key, `${this.cwd}${newName}.${fileType}`);
       await axios.delete(`/api/write/items/${key}`);
       this.fetchFiles();
     },
@@ -490,8 +629,11 @@ export default {
   position: sticky;
   top: 0;
   padding: 8px;
-  background-color: white;
+  background-color: #ffffff37;
   display: flex;
+  box-shadow: 0px -3px 13px 0px #00000073;
+  z-index: 1;
+  backdrop-filter: blur(10px);
 }
 
 .menu-button {

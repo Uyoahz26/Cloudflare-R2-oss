@@ -26,17 +26,28 @@ ul {
 }
 
 .file-list {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
   flex-wrap: wrap;
-}
-
-.file-list > li {
-  width: 33.33%;
+  padding: 10px;
 }
 
 @media only screen and (max-width: 768px) {
-  .file-list > li {
-    width: 100%;
+  .file-list {
+    padding-bottom: 90px;
+    grid-template-columns: none;
+  }
+  /* .file-list > li {
+    flex: 1 1 100%;
+  } */
+  .contextmenu-button {
+    display: block !important;
+    background-color: #ffffff00 !important;
+  }
+  .upload-button {
+    right: 26px !important;
+    bottom: 35px !important;
   }
 }
 
@@ -55,20 +66,46 @@ input[type="search"] {
 
 .file-item {
   height: 64px;
-  padding: 8px 0;
+  padding: 8px 6px;
   transition: background-color 0.2s ease-in-out;
   display: flex;
   align-items: center;
-  cursor: pointer;
   user-select: none;
+  position: relative;
 }
 
 .file-item:hover {
-  background-color: #f5f5f5;
+  background-color: #bababa2e;
+  border-radius: 5px;
+}
+
+.file-item:hover .contextmenu-button {
+  display: block;
 }
 
 .file-item > div {
   min-width: 0;
+}
+
+.contextmenu-button {
+  display: none;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 20px;
+  background-color: #98989885;
+  padding: 0 5px;
+  border-radius: 50%;
+  width: 27px;
+  height: 27px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0px 1px 6px 1px #62626291;
+}
+
+.contextmenu-button svg {
+  position: relative;
+  top: 3px;
+  left: -1px;
 }
 
 .file-icon {
@@ -85,12 +122,17 @@ input[type="search"] {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  font-size: 16px;
+  letter-spacing: 0.23px;
+  font-weight: 400;
+  max-width: 80vw;
 }
 
 .file-attr {
   margin-top: 4px;
-  color: dimgray;
+  color: #8d8d8d;
   font-size: 0.8em;
+  letter-spacing: 0.3px;
 }
 
 .file-attr > span + span {
@@ -115,9 +157,11 @@ button.circle {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgb(243, 128, 32);
+  background-color: #669dea7a;
   cursor: pointer;
   box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  backdrop-filter: blur(3px);
 }
 
 .upload-button {
@@ -133,13 +177,31 @@ button.circle {
 .contextmenu-filename {
   padding: 12px;
   min-width: 256px;
+  background: #f0f0f0ab;
+  /* text-align: center; */
+  font-size: 13px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.focused-item-icon {
+  position: absolute;
+  top: -130px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  color: white;
+  letter-spacing: 1px;
+  font-weight: 600;
+  width: max-content;
+  text-align: center;
 }
 
 .contextmenu-list > li > * {
   display: block;
   width: 100%;
-  padding: 12px;
-  text-align: left;
+  padding: 12px 20px;
+  text-align: center;
   transition: background-color 0.2s ease-in-out;
   font-size: inherit;
 }

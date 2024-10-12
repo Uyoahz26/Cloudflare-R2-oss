@@ -28,15 +28,18 @@ const emit = defineEmits(["update:modelValue"]);
   width: 100%;
   height: 100%;
   z-index: 9998;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: #9c9c9cb3;
   display: flex;
   justify-content: center;
   align-items: center;
+  backdrop-filter: blur(5px);
 }
 
 .dialog-container {
+  position: relative;
   background-color: white;
   border-radius: 8px;
-  overflow: hidden;
+  box-shadow: -1px 4px 16px 0px #27272778;
+  margin-top: 80px;
 }
 </style>

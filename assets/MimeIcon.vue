@@ -24,6 +24,7 @@ defineProps({
       :height="size"
       alt="Image"
       loading="lazy"
+      style="object-fit: cover"
     />
     <svg
       v-else

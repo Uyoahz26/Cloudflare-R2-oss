@@ -29,6 +29,9 @@ const emit = defineEmits(["update:modelValue", "click"]);
             emit('click', item.text);
           "
         >
+          <template v-if="item.type === 'dividingLine'">
+            <div style="height: 1px; border-top: 1px black solid"></div>
+          </template>
           <span v-text="item.text"></span>
         </li>
       </ul>
@@ -43,8 +46,9 @@ const emit = defineEmits(["update:modelValue", "click"]);
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgb(0 0 0 / 19%);
   z-index: 1;
+  backdrop-filter: blur(10px);
 }
 
 .menu-content {
@@ -53,13 +57,14 @@ const emit = defineEmits(["update:modelValue", "click"]);
   z-index: 2;
   border-radius: 6px;
   right: -100%;
-  min-width: 128px;
+  min-width: 120px;
 }
 
 .menu-content li {
   padding: 10px;
   cursor: pointer;
   transition: background-color 0.2s;
+  padding: 10px 15px;
 }
 
 .menu-content li:hover {

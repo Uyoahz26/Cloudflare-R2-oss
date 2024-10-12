@@ -1,5 +1,14 @@
 const THUMBNAIL_SIZE = 144;
 
+axios.interceptors.response.use(
+  (data) => data,
+  (err) => {
+    const { statusText, status } = err.response;
+    alert(`【${status}】 ${statusText}`);
+    return Promise.reject(err);
+  }
+);
+
 /**
  * @param {File} file
  */
