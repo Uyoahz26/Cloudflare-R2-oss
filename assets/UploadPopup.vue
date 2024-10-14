@@ -12,7 +12,7 @@ const emit = defineEmits(["update:modelValue", "upload", "createFolder"]);
       <div
         v-if="modelValue"
         class="popup-modal"
-        @click="emit('update:modelValue', false)"
+        @click.stop="emit('update:modelValue', false)"
       ></div>
     </Transition>
     <Transition name="slide-up">
@@ -68,7 +68,7 @@ const emit = defineEmits(["update:modelValue", "upload", "createFolder"]);
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1;
+  z-index: 2;
   background-color: #0000005e;
   backdrop-filter: blur(3px);
 }

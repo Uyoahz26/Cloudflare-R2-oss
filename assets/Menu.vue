@@ -44,11 +44,10 @@ const emit = defineEmits(["update:modelValue", "click"]);
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgb(0 0 0 / 19%);
+  width: 100vw;
+  height: 100vh;
+  background-color: #00000030;
   z-index: 1;
-  backdrop-filter: blur(10px);
 }
 
 .menu-content {
@@ -58,6 +57,7 @@ const emit = defineEmits(["update:modelValue", "click"]);
   border-radius: 6px;
   right: -100%;
   min-width: 120px;
+  box-shadow: 0px 6px 20px #7b7b7b75;
 }
 
 .menu-content li {

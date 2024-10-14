@@ -1,10 +1,12 @@
 const THUMBNAIL_SIZE = 144;
-
+cocoMessage.config({
+  duration: 3000,
+});
 axios.interceptors.response.use(
   (data) => data,
   (err) => {
-    const { statusText, status } = err.response;
-    alert(`【${status}】 ${statusText}`);
+    const { statusText, status, data } = err.response;
+    cocoMessage.error(`【${status}】 ${data ?? statusText}`);
     return Promise.reject(err);
   }
 );

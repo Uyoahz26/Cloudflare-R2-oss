@@ -1,5 +1,13 @@
 <template>
-  <div class="main" @dragenter.prevent @dragover.prevent @drop.prevent="onDrop">
+  <div
+    :style="{
+      overflow: showUploadPopup || showContextMenu || showMenu ? 'hidden' : '',
+    }"
+    class="main"
+    @dragenter.prevent
+    @dragover.prevent
+    @drop.prevent="onDrop"
+  >
     <progress
       v-if="uploadProgress !== null"
       :value="uploadProgress"
@@ -62,7 +70,6 @@
             { text: '名称 A-Z' },
             { text: '从大到小 ↑' },
             { text: '从小到大 ↓' },
-            { text: '粘贴' },
           ]"
           @click="onMenuClick"
         />
@@ -88,80 +95,49 @@
           <span class="file-name">返回上一级..</span>
         </div>
       </li>
-      <li v-for="folder in filteredFolders" :key="folder">
-        <div
-          tabindex="0"
-          class="file-item"
-          @contextmenu.prevent="
-            showContextMenu = true;
-            focusedItem = folder;
-          "
-        >
-          <div class="file-icon">
-            <MimeIcon thumbnail="assets/images/file-folder.svg" />
-          </div>
-          <span
-            @click="cwd = folder"
-            class="file-name"
-            style="cursor: pointer"
-            v-text="folder.match(/.*?([^/]*)\/?$/)[1]"
-          ></span>
+      <transition-group name="fileList" mode="out-in">
+        <li v-for="folder in filteredFolders" :key="folder">
           <div
-            class="contextmenu-button"
-            @click.stop="
+            tabindex="0"
+            class="file-item"
+            @contextmenu.prevent="
               showContextMenu = true;
               focusedItem = folder;
             "
           >
-            <svg
-              t="1728718960353"
-              class="icon"
-              viewBox="0 0 4096 1024"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              p-id="43249"
-              width="20"
-              height="20"
+            <div
+              style="cursor: pointer; position: relative"
+              class="file-icon"
+              @click="cwd = folder"
             >
-              <path
-                d="M3245.397333 472.746667c0 232.106667 178.517333 419.84 399.018667 419.84s399.36-187.733333 399.36-419.84c0-232.106667-178.858667-420.181333-399.36-420.181334-220.501333 0-399.36 187.733333-399.36 419.84z m-798.378666 0C2447.36 240.64 2268.501333 52.565333 2048 52.565333s-399.36 187.733333-399.36 419.84c0 232.106667 178.858667 420.181333 399.36 420.181334 220.501333 0 399.36-187.733333 399.36-419.84z m-1596.416 0c0-232.106667-178.517333-420.181333-399.018667-420.181334s-399.36 187.733333-399.36 419.84c0 232.106667 178.858667 420.181333 399.36 420.181334 105.813333 0 207.530667-44.373333 282.282667-122.88 75.093333-78.506667 116.736-185.685333 116.736-296.96z"
-                fill="#000000"
-                p-id="43250"
-              ></path>
-            </svg>
-          </div>
-        </div>
-      </li>
-      <li v-for="file in filteredFiles" :key="file.key">
-        <div
-          @contextmenu.prevent="
-            showContextMenu = true;
-            focusedItem = file;
-          "
-        >
-          <div class="file-item">
-            <MimeIcon
-              :content-type="file.httpMetadata.contentType"
-              :thumbnail="
-                file.customMetadata.thumbnail
-                  ? `/raw/_$flaredrive$/thumbnails/${file.customMetadata.thumbnail}.png`
-                  : getFileIcon(file)
-                  ? getFileIcon(file)
-                  : null
-              "
-            />
-            <div style="cursor: pointer" @click="preview(`/raw/${file.key}`)">
-              <div class="file-name" v-text="file.key.split('/').pop()"></div>
-              <div class="file-attr">
-                <span v-text="new Date(file.uploaded).toLocaleString()"></span>
-                <span v-text="formatSize(file.size)"></span>
-              </div>
+              <MimeIcon thumbnail="assets/images/file-folder.svg" size="42" />
+              <template v-if="FolderQQ[folder.match(/.*?([^/]*)\/?$/)[1]]">
+                <img
+                  style="
+                    height: 22px;
+                    position: absolute;
+                    left: 14px;
+                    top: 15px;
+                    border-radius: 50%;
+                    filter: opacity(0.8);
+                  "
+                  :src="`https://q1.qlogo.cn/g?b=qq&nk=${
+                    FolderQQ[folder.match(/.*?([^/]*)\/?$/)[1]]
+                  }&s=640`"
+                />
+              </template>
             </div>
+            <span
+              @click="cwd = folder"
+              class="file-name"
+              style="cursor: pointer"
+              >{{ folder.match(/.*?([^/]*)\/?$/)[1] }}</span
+            >
             <div
               class="contextmenu-button"
               @click.stop="
                 showContextMenu = true;
-                focusedItem = file;
+                focusedItem = folder;
               "
             >
               <svg
@@ -171,19 +147,75 @@
                 version="1.1"
                 xmlns="http://www.w3.org/2000/svg"
                 p-id="43249"
-                width="20"
-                height="20"
+                width="15"
+                height="15"
               >
                 <path
                   d="M3245.397333 472.746667c0 232.106667 178.517333 419.84 399.018667 419.84s399.36-187.733333 399.36-419.84c0-232.106667-178.858667-420.181333-399.36-420.181334-220.501333 0-399.36 187.733333-399.36 419.84z m-798.378666 0C2447.36 240.64 2268.501333 52.565333 2048 52.565333s-399.36 187.733333-399.36 419.84c0 232.106667 178.858667 420.181333 399.36 420.181334 220.501333 0 399.36-187.733333 399.36-419.84z m-1596.416 0c0-232.106667-178.517333-420.181333-399.018667-420.181334s-399.36 187.733333-399.36 419.84c0 232.106667 178.858667 420.181333 399.36 420.181334 105.813333 0 207.530667-44.373333 282.282667-122.88 75.093333-78.506667 116.736-185.685333 116.736-296.96z"
-                  fill="#333333"
+                  fill="#000000"
                   p-id="43250"
                 ></path>
               </svg>
             </div>
           </div>
-        </div>
-      </li>
+        </li>
+        <li v-for="file in filteredFiles" :key="file.key">
+          <div
+            @contextmenu.prevent="
+              showContextMenu = true;
+              focusedItem = file;
+            "
+          >
+            <div class="file-item">
+              <MimeIcon
+                style="cursor: pointer"
+                @click="preview(`/raw/${file.key}`)"
+                :content-type="file.httpMetadata.contentType"
+                :thumbnail="
+                  file.customMetadata.thumbnail
+                    ? `/raw/_$flaredrive$/thumbnails/${file.customMetadata.thumbnail}.png`
+                    : getFileIcon(file)
+                    ? getFileIcon(file)
+                    : null
+                "
+              />
+              <div style="cursor: pointer" @click="preview(`/raw/${file.key}`)">
+                <div class="file-name" v-text="file.key.split('/').pop()"></div>
+                <div class="file-attr">
+                  <span
+                    v-text="new Date(file.uploaded).toLocaleString()"
+                  ></span>
+                  <span v-text="formatSize(file.size)"></span>
+                </div>
+              </div>
+              <div
+                class="contextmenu-button"
+                @click.stop="
+                  showContextMenu = true;
+                  focusedItem = file;
+                "
+              >
+                <svg
+                  t="1728718960353"
+                  class="icon"
+                  viewBox="0 0 4096 1024"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  p-id="43249"
+                  width="15"
+                  height="15"
+                >
+                  <path
+                    d="M3245.397333 472.746667c0 232.106667 178.517333 419.84 399.018667 419.84s399.36-187.733333 399.36-419.84c0-232.106667-178.858667-420.181333-399.36-420.181334-220.501333 0-399.36 187.733333-399.36 419.84z m-798.378666 0C2447.36 240.64 2268.501333 52.565333 2048 52.565333s-399.36 187.733333-399.36 419.84c0 232.106667 178.858667 420.181333 399.36 420.181334 220.501333 0 399.36-187.733333 399.36-419.84z m-1596.416 0c0-232.106667-178.517333-420.181333-399.018667-420.181334s-399.36 187.733333-399.36 419.84c0 232.106667 178.858667 420.181333 399.36 420.181334 105.813333 0 207.530667-44.373333 282.282667-122.88 75.093333-78.506667 116.736-185.685333 116.736-296.96z"
+                    fill="#333333"
+                    p-id="43250"
+                  ></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </li>
+      </transition-group>
     </ul>
     <div v-if="loading" style="margin-top: 12px; text-align: center">
       <span>加载中...</span>
@@ -292,6 +324,14 @@ export default {
     showUploadPopup: false,
     uploadProgress: null,
     uploadQueue: [],
+    uploadLoading: null,
+    FolderQQ: {
+      ZhaoYU: "2496091142",
+      Tina: "1478367130",
+      ZhaoYuxuan: "1812028206",
+      ZhaoTengye: "3072969190",
+      ZhangRuili: "3099215275",
+    },
   }),
 
   computed: {
@@ -392,18 +432,22 @@ export default {
     async createFolder() {
       try {
         const folderName = window.prompt("请输入文件夹名称");
-        if (!folderName) return;
+        if (!folderName) {
+          cocoMessage.error("玩呢？？？？");
+          return;
+        }
         this.showUploadPopup = false;
         const uploadUrl = `/api/write/items/${this.cwd}${folderName}/_$folder$`;
-        await axios.put(uploadUrl, "");
-        this.fetchFiles();
+        const res = await axios.put(uploadUrl, "");
+        const folderKey = res.data.key.replace("_$folder$", "");
+        this.folders.push(folderKey);
+        cocoMessage.success("创建成功");
       } catch (error) {
         fetch("/api/write/")
           .then((value) => {
             if (value.redirected) window.location.href = value.url;
           })
-          .catch(() => {});
-        console.log(`Create folder failed`);
+          .catch();
       }
     },
 
@@ -449,22 +493,22 @@ export default {
 
     onMenuClick(text) {
       switch (text) {
-        case "名称A-Z":
+        case "名称 A-Z":
           this.order = null;
           break;
-        case "大小↑":
-          this.order = "大小↑";
+        case "从大到小 ↑":
+          this.order = "从大到小 ↑";
           break;
-        case "大小↓":
-          this.order = "大小↓";
+        case "从小到大 ↓":
+          this.order = "从小到大 ↓";
           break;
-        case "粘贴":
-          return this.pasteFile();
+        // case "粘贴":
+        //   return this.pasteFile();
       }
       this.files.sort((a, b) => {
-        if (this.order === "大小↑") {
+        if (this.order === "从小到大 ↓") {
           return a.size - b.size;
-        } else if (this.order === "大小↓") {
+        } else if (this.order === "从大到小 ↑") {
           return b.size - a.size;
         } else {
           return a.key.localeCompare(b.key);
@@ -495,11 +539,13 @@ export default {
     async processUploadQueue() {
       if (!this.uploadQueue.length) {
         this.fetchFiles();
+        cocoMessage.success("上传完成");
+        this.uploadLoading();
+        this.uploadLoading = null;
         this.uploadProgress = null;
         return;
       }
-
-      /** @type File **/
+      this.uploadLoading ??= cocoMessage.loading("正在上传中...");
       const { basedir, file } = this.uploadQueue.pop(0);
       let thumbnailDigest = null;
 
@@ -554,10 +600,22 @@ export default {
     },
 
     async removeFile(key) {
-      const DeleteFlag = window.confirm(`确定要删除${key}？`);
+      const DeleteFlag = window.confirm(
+        `确定要删除 ${key.replace("/_$folder$", "")} ？`
+      );
       if (DeleteFlag) {
         await axios.delete(`/api/write/items/${key}`);
-        this.fetchFiles();
+        const targetRef = key.includes("_$folder$") ? this.folders : this.files;
+        if (key.includes("_$folder$")) {
+          key = key.replace("_$folder$", "");
+        }
+        const fileIndex = targetRef.findIndex(
+          (file) => (file.key ?? file) === key
+        );
+        if (fileIndex !== -1) {
+          targetRef.splice(fileIndex, 1);
+          cocoMessage.success("删除成功", 3000);
+        }
       }
     },
 
@@ -569,7 +627,11 @@ export default {
       if (!newName) return;
       await this.copyPaste(key, `${this.cwd}${newName}.${fileType}`);
       await axios.delete(`/api/write/items/${key}`);
-      this.fetchFiles();
+      const targetFile = this.files.find((file) => file.key === key);
+      if (targetFile) {
+        targetFile.key = `${newName}.${fileType}`;
+        cocoMessage.success(`我重生了,这一世我叫【${newName}】`);
+      }
     },
 
     uploadFiles(files) {
@@ -621,6 +683,22 @@ export default {
 </script>
 
 <style>
+.fileList-move,
+.fileList-enter-active,
+.fileList-leave-active {
+  position: relative;
+  transition: all 0.666s cubic-bezier(0.55, 0, 0.1, 1);
+}
+.fileList-leave-to {
+  opacity: 0;
+  width: 50%;
+  transform: scale(0.1) translate(30px, -50%) rotate3d(1, 1, 1, 240deg);
+}
+.fileList-leave-active {
+  position: absolute;
+  bottom: 0;
+}
+
 .main {
   height: 100%;
 }

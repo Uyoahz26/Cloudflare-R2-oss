@@ -93,7 +93,7 @@ input[type="search"] {
   position: absolute;
   right: 10px;
   top: 20px;
-  background-color: #98989885;
+  background-color: #aeaeae1a;
   padding: 0 5px;
   border-radius: 50%;
   width: 27px;
@@ -104,8 +104,8 @@ input[type="search"] {
 
 .contextmenu-button svg {
   position: relative;
-  top: 3px;
-  left: -1px;
+  top: 5.5px;
+  left: 1.4px;
 }
 
 .file-icon {
@@ -186,7 +186,7 @@ button.circle {
 
 .focused-item-icon {
   position: absolute;
-  top: -130px;
+  top: -160px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 22px;
@@ -195,6 +195,8 @@ button.circle {
   font-weight: 600;
   width: max-content;
   text-align: center;
+  padding: 30px;
+  pointer-events: none;
 }
 
 .contextmenu-list > li > * {
