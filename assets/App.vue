@@ -540,7 +540,7 @@ export default {
     async processUploadQueue() {
       if (!this.uploadQueue.length) {
         this.fetchFiles();
-        cocoMessage.success("上传完成");
+        // cocoMessage.success("上传完成");
         this.uploadLoading();
         this.uploadLoading = null;
         this.uploadProgress = null;
