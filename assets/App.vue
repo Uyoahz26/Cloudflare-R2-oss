@@ -95,7 +95,7 @@
           <span class="file-name">返回上一级..</span>
         </div>
       </li>
-      <transition-group name="fileList" mode="out-in">
+      <transition-group :name="isDeleting ? 'fileList' : ''" mode="out-in">
         <li v-for="folder in filteredFolders" :key="folder">
           <div
             tabindex="0"
@@ -325,6 +325,7 @@ export default {
     uploadProgress: null,
     uploadQueue: [],
     uploadLoading: null,
+    isDeleting: false,
     FolderQQ: {
       ZhaoYU: "2496091142",
       Tina: "1478367130",
@@ -452,8 +453,8 @@ export default {
     },
 
     fetchFiles() {
-      this.files = [];
-      this.folders = [];
+      this.files.length = 0;
+      this.folders.length = 0;
       this.loading = true;
       fetch(`/api/children/${this.cwd}`)
         .then((res) => res.json())
@@ -609,12 +610,16 @@ export default {
         if (key.includes("_$folder$")) {
           key = key.replace("_$folder$", "");
         }
+        this.isDeleting = true;
         const fileIndex = targetRef.findIndex(
           (file) => (file.key ?? file) === key
         );
         if (fileIndex !== -1) {
           targetRef.splice(fileIndex, 1);
           cocoMessage.success("删除成功", 3000);
+          setTimeout(() => {
+            this.isDeleting = false;
+          }, 400);
         }
       }
     },
@@ -627,10 +632,14 @@ export default {
       if (!newName) return;
       await this.copyPaste(key, `${this.cwd}${newName}.${fileType}`);
       await axios.delete(`/api/write/items/${key}`);
+      this.isDeleting = true;
       const targetFile = this.files.find((file) => file.key === key);
       if (targetFile) {
         targetFile.key = `${newName}.${fileType}`;
         cocoMessage.success(`我重生了,这一世我叫【${newName}】`);
+        setTimeout(() => {
+          this.isDeleting = false;
+        }, 400);
       }
     },
 
