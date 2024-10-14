@@ -110,7 +110,7 @@
               class="file-icon"
               @click="cwd = folder"
             >
-              <MimeIcon thumbnail="assets/images/file-folder.svg" size="42" />
+              <MimeIcon thumbnail="assets/images/file-folder.svg" :size="42" />
               <template v-if="FolderQQ[folder.match(/.*?([^/]*)\/?$/)[1]]">
                 <img
                   style="
