@@ -1,13 +1,5 @@
 <template>
-  <div
-    :style="{
-      overflow: showUploadPopup || showContextMenu || showMenu ? 'hidden' : '',
-    }"
-    class="main"
-    @dragenter.prevent
-    @dragover.prevent
-    @drop.prevent="onDrop"
-  >
+  <div class="main" @dragenter.prevent @dragover.prevent @drop.prevent="onDrop">
     <progress
       v-if="uploadProgress !== null"
       :value="uploadProgress"
@@ -671,6 +663,15 @@ export default {
         } - 文件库`;
       },
       immediate: true,
+    },
+    showUploadPopup(val) {
+      document.body.style.overflow = val ? "hidden" : "";
+    },
+    showContextMenu(val) {
+      document.body.style.overflow = val ? "hidden" : "";
+    },
+    showMenu(val) {
+      document.body.style.overflow = val ? "hidden" : "";
     },
   },
 
