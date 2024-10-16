@@ -1,5 +1,16 @@
-export function get_auth_status(context) {
+export function get_auth_status(context, verifyFlag = false) {
+  if (verifyFlag && typeof context === "string") {
+    const USERS = {
+      "admin:admin": "*",
+      "user:user": "user/",
+    };
+    console.log("account: ", context);
+    return USERS[context];
+    // return context.env[context];
+  }
+
   var dopath = context.request.url.split("/api/write/items/")[1];
+  console.log("dopath: ", dopath);
   if (context.env["GUEST"]) {
     if (dopath.startsWith("_$flaredrive$/thumbnails/")) return true;
     const allow_guest = context.env["GUEST"].split(",");
@@ -12,9 +23,12 @@ export function get_auth_status(context) {
     }
   }
   var headers = new Headers(context.request.headers);
+  console.log("headers: ", headers);
   if (!headers.get("Authorization")) return false;
   const Authorization = headers.get("Authorization").split("Basic ")[1];
+  console.log("Authorization: ", Authorization);
   const account = atob(Authorization);
+  console.log("account: ", account);
   if (!account) return false;
   if (!context.env[account]) return false;
   if (dopath.startsWith("_$flaredrive$/thumbnails/")) return true;

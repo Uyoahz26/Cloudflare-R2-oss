@@ -90,12 +90,18 @@ export async function onRequestPutMultipart(context) {
 
 export async function onRequestPut(context) {
   if (!get_auth_status(context)) {
-    return new Response("么得权限", {
-      status: 401,
-      headers: {
-        "WWW-Authenticate": "Basic ",
-      },
-    });
+    return new Response(
+      JSON.stringify({
+        flag: false,
+        message: "么得权限",
+      }),
+      {
+        status: 401,
+        headers: {
+          "WWW-Authenticate": "Basic ",
+        },
+      }
+    );
   }
   const url = new URL(context.request.url);
 
@@ -126,23 +132,30 @@ export async function onRequestPut(context) {
 
   const obj = await bucket.put(path, content, { customMetadata });
   const { key, size, uploaded } = obj;
-  return new Response(JSON.stringify({ key, size, uploaded }), {
+  return new Response(JSON.stringify({ flag: true, key, size, uploaded }), {
     headers: { "Content-Type": "application/json" },
   });
 }
 
 export async function onRequestDelete(context) {
   if (!get_auth_status(context)) {
-    return new Response("么得权限", {
-      status: 401,
-      headers: {
-        "WWW-Authenticate": "Basic ",
-      },
-    });
+    return new Response(null, { status: 204 });
+    return new Response(
+      JSON.stringify({
+        flag: false,
+        message: "么得权限",
+      }),
+      {
+        status: 401,
+        headers: {
+          "WWW-Authenticate": "Basic ",
+        },
+      }
+    );
   }
   const [bucket, path] = parseBucketPath(context);
   if (!bucket) return notFound();
 
   await bucket.delete(path);
-  return new Response(null, { status: 204 });
+  return new Response(JSON.stringify({ flag: true }), { status: 204 });
 }

@@ -1,0 +1,82 @@
+{
+  "name": "uyoahz-oss",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">= 16",
+    "pnpm": ">= 6"
+  },
+  "scripts": {
+    "bootstrap": "pnpm install",
+    "dev": "pnpm bootstrap && vite",
+    "build": "export env TZ='Asia/Shanghai' && vite build"
+  },
+  "dependencies": {
+    "@icon-park/vue-next": "1.4.2",
+    "@vueuse/core": "11.1.0",
+    "axios": "1.7.7",
+    "coco-message": "^2.0.3",
+    "crypto-js": "4.2.0",
+    "naive-ui": "2.40.1",
+    "pinia": "2.2.4",
+    "pinia-plugin-persistedstate": "4.1.1",
+    "vue": "3.5.12",
+    "vue-router": "4.2.5",
+    "vuetify": "3.7.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.5.0",
+    "@commitlint/config-conventional": "19.5.0",
+    "@types/node": "22.7.5",
+    "@typescript-eslint/eslint-plugin": "8.8.1",
+    "@typescript-eslint/parser": "8.8.1",
+    "@vitejs/plugin-vue": "5.1.4",
+    "autoprefixer": "10.4.20",
+    "commitizen": "4.3.1",
+    "commitlint-config-cz": "0.13.3",
+    "cross-env": "7.0.3",
+    "eslint": "9.12.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "eslint-plugin-vue": "9.29.0",
+    "font-awesome": "4.7.0",
+    "lint-staged": "15.2.10",
+    "material-design-icons-iconfont": "^6.7.0",
+    "postcss": "8.4.47",
+    "postcss-html": "1.7.0",
+    "postcss-scss": "4.0.9",
+    "prettier": "3.3.3",
+    "sass": "1.79.5",
+    "stylelint": "16.10.0",
+    "stylelint-config-prettier": "9.0.5",
+    "stylelint-config-standard": "36.0.1",
+    "ts-node": "10.9.2",
+    "type-fest": "4.26.1",
+    "typescript": "5.6.3",
+    "unocss": "0.63.4",
+    "unplugin-auto-import": "0.18.3",
+    "unplugin-vue-components": "0.27.4",
+    "vite": "5.4.8",
+    "vite-plugin-style-import": "^2.0.0",
+    "vue-eslint-parser": "9.4.2",
+    "vue-tsc": "2.1.6"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint",
+      "prettier --write"
+    ],
+    "*.vue": [
+      "eslint --fix",
+      "prettier --write",
+      "stylelint --fix"
+    ],
+    "*.{vue,scss,css}": [
+      "stylelint --fix",
+      "prettier --write"
+    ]
+  },
+  "browserslist": [
+    "> 1%, last 1 version"
+  ]
+}

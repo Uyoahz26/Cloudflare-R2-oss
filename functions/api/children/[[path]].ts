@@ -1,4 +1,5 @@
 import { notFound, parseBucketPath } from "@/utils/bucket";
+import { AccountMapping } from "../login";
 
 export async function onRequestGet(context) {
   try {
@@ -19,12 +20,21 @@ export async function onRequestGet(context) {
       });
 
     let folders = objList.delimitedPrefixes;
-    if (!path)
+    if (!path) {
       folders = folders.filter((folder) => folder !== "_$flaredrive$/");
+    }
 
-    return new Response(JSON.stringify({ value: objKeys, folders }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    folders.map((v) => ({
+      path: v,
+      qqID: AccountMapping[v.split("/")[0]],
+    }));
+
+    return new Response(
+      JSON.stringify({ value: objKeys, folders, flag: true }),
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (e) {
     return new Response(e.toString(), { status: 500 });
   }

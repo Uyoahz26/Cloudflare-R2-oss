@@ -448,7 +448,7 @@ export default {
       this.files.length = 0;
       this.folders.length = 0;
       this.loading = true;
-      fetch(`/api/children/${this.cwd}`)
+      fetch(`https://uyoahz.site/api/children/${this.cwd}`)
         .then((res) => res.json())
         .then((files) => {
           this.files = files.value;
