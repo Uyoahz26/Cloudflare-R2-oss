@@ -1,6 +1,9 @@
-export type MenuOptions = {
-  title: string;
-  platform: string;
-  project: string;
-  disabled?: boolean;
+export type Action = "copyLink" | "delete" | "rename" | "download";
+
+export type FileAction = {
+  text: string;
+  value: Action;
+  icon: string;
 };
+
+export type FileActions = FileAction[];

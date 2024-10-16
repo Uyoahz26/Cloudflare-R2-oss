@@ -15,6 +15,7 @@ import Excel from "@/assets/images/excel.svg";
 import Word from "@/assets/images/word.svg";
 import WinRAR from "@/assets/images/winrar.svg";
 import File from "@/assets/images/file.svg";
+import FileFolder from "@/assets/images/file-folder.svg";
 
 cocoMessage.config({
   duration: 3000,
@@ -29,7 +30,11 @@ export function msgs(
 }
 
 export function getFileIcon(filtInfo) {
-  const { httpMetadata, key } = filtInfo;
+  const { httpMetadata, key, customMetadata, path } = filtInfo;
+  if (path) return FileFolder;
+  if (customMetadata?.thumbnail) {
+    return `/raw/_$flaredrive$/thumbnails/${customMetadata?.thumbnail}.png`;
+  }
   let mimeType = httpMetadata.contentType;
   if (!mimeType) {
     const TypeMapping = {

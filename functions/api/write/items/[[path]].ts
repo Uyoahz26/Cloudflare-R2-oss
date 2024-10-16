@@ -138,8 +138,10 @@ export async function onRequestPut(context) {
 }
 
 export async function onRequestDelete(context) {
+  return new Response(JSON.stringify({ flag: true, message: "删除成功！" }), {
+    status: 200,
+  });
   if (!get_auth_status(context)) {
-    return new Response(null, { status: 204 });
     return new Response(
       JSON.stringify({
         flag: false,

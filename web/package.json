@@ -16,6 +16,7 @@
     "@vueuse/core": "11.1.0",
     "axios": "1.7.7",
     "coco-message": "^2.0.3",
+    "colorthief": "^2.6.0",
     "crypto-js": "4.2.0",
     "naive-ui": "2.40.1",
     "pinia": "2.2.4",

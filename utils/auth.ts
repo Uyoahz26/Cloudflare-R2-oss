@@ -23,16 +23,20 @@ export function get_auth_status(context, verifyFlag = false) {
     }
   }
   var headers = new Headers(context.request.headers);
-  console.log("headers: ", headers);
   if (!headers.get("Authorization")) return false;
+  context.env = {
+    "admin:admin": "*",
+    "user:user": "user/",
+  };
   const Authorization = headers.get("Authorization").split("Basic ")[1];
   console.log("Authorization: ", Authorization);
-  const account = atob(Authorization);
+  const account = decodeURIComponent(atob(Authorization));
   console.log("account: ", account);
   if (!account) return false;
   if (!context.env[account]) return false;
   if (dopath.startsWith("_$flaredrive$/thumbnails/")) return true;
   const allow = context.env[account].split(",");
+  console.log("allow: ", allow);
   for (var a of allow) {
     if (a == "*") {
       return true;

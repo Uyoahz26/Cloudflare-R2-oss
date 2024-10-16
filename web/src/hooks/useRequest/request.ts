@@ -5,7 +5,7 @@ import { InterceptorHooks, ExpandAxiosRequestConfig } from "./types";
 export default class Request {
   private _instance: AxiosInstance;
   private _defaultConfig: ExpandAxiosRequestConfig = {
-    baseURL: import.meta.env.PROD ? `//${location.host}` : "",
+    baseURL: import.meta.env.PROD ? `//uyoahz.site` : "",
     timeout: 0,
     requestOptions: {
       globalSuccessMessage: false,

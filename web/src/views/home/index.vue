@@ -8,7 +8,11 @@
     <div
       class="bg-[#fff] rounded-4px mb-5px p-10px flex-1 max-h-[calc(100vh-50px)] overflow-y-scroll"
     >
-      <v-pull-to-refresh :pull-down-threshold="66" @load="getFileList">
+      <v-pull-to-refresh
+        :pull-down-threshold="66"
+        @load="getFileList"
+        class="h-full"
+      >
         <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
         <v-empty-state
           v-else-if="!foldersResult.length && !filesResult.length"
@@ -23,13 +27,18 @@
             v-for="(folder, index) in foldersResult"
             :key="folder.path"
             :value="folder.path"
-            @click="folders.splice(index, 1)"
+            @click.self
           >
             <v-list-item-title
               class="flex items-center gap-x-6px select-none relative"
             >
               <div class="relative">
-                <img :src="FileFolder" :width="42" alt="Image" loading="lazy" />
+                <img
+                  :src="getFileIcon(folder)"
+                  :width="42"
+                  alt="Image"
+                  loading="lazy"
+                />
                 <template v-if="folder.qqID">
                   <img
                     class="absolute left-10px top-12px rounded-full h-22px opacity-80"
@@ -45,7 +54,7 @@
                 color="primary"
                 size="small"
               >
-                This is yours
+                <span class="font-bold">This is yours</span>
               </v-chip>
               <div class="absolute right-1 hidden file-more-action">
                 <v-btn
@@ -120,12 +129,11 @@
       </div> -->
     </div>
   </div>
-  <FileAction v-model="targetFile" />
+  <FileAction v-model="targetFile" @delete="onDelete" />
 </template>
 <script lang="ts" setup>
 import TabBar from "./components/tabBar/tabBar.vue";
 import FileAction from "./components/fileAction/file-action.vue";
-import FileFolder from "@/assets/images/file-folder.svg";
 import { VPullToRefresh } from "vuetify/labs/VPullToRefresh";
 import Progress from "./components/progress/progress.vue";
 import { get } from "@/hooks/useRequest";
@@ -140,7 +148,7 @@ const loading = useGetLoading();
 const sortWay = ref(null);
 const dialog = ref(false);
 const searchKey = ref("");
-const deletingFlag = ref(true);
+const deletingFlag = ref(false);
 const targetFile = ref();
 const files = ref<Record<string, string>[]>([]);
 const folders = ref<Record<string, string>[]>([]);
@@ -159,7 +167,7 @@ const foldersResult = computed(() => {
   );
 });
 
-const getFileList = async (event?) => {
+const getFileList = async (event?): Promise<void> => {
   folders.value.length = 0;
   files.value.length = 0;
   const data = await get("/api/children");
@@ -171,6 +179,19 @@ const getFileList = async (event?) => {
 getFileList();
 
 const preview = (path: string) => window.open(`/raw/${path}`);
+
+const onDelete = (target): void => {
+  deletingFlag.value = true;
+  const targetData = target.path ? folders.value : files.value;
+  const compareFied = target.path ? "path" : "key";
+  const index = targetData.findIndex(
+    (v) => v[compareFied] === target[compareFied]
+  );
+  targetData.splice(index, 1);
+  setTimeout(() => {
+    deletingFlag.value = false;
+  }, 400);
+};
 </script>
 <style lang="scss" scoped>
 @media only screen and (max-width: 768px) {

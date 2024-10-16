@@ -18,8 +18,7 @@ export const transform: InterceptorHooks = {
     if (options?.globalCheckToken) {
       checkToken()
         .then(() => {
-          config!.headers!.Authorization = "Token";
-          config!.headers!.Token = getToken();
+          config!.headers!.Authorization = "Basic " + getToken();
         })
         .catch(checkout);
     }
