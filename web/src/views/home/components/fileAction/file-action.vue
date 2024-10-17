@@ -136,7 +136,6 @@ const showSheet = computed({
     if (!!targetFile.value) {
       nextTick(() => {
         new ThemeColor(getFileIcon(targetFile.value), (_, color) => {
-          console.log("color: ", color);
           const styleSheet =
             document.styleSheets[document.styleSheets.length - 1];
           const keyframes = `
@@ -150,8 +149,6 @@ const showSheet = computed({
               }
             }
           `;
-
-          // 将 keyframes 插入到样式表中
           styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
         });
       });

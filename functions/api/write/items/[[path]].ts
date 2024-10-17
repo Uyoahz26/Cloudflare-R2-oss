@@ -89,61 +89,60 @@ export async function onRequestPutMultipart(context) {
 }
 
 export async function onRequestPut(context) {
-  if (!get_auth_status(context)) {
-    return new Response(
-      JSON.stringify({
-        flag: false,
-        message: "么得权限",
-      }),
-      {
-        status: 401,
-        headers: {
-          "WWW-Authenticate": "Basic ",
-        },
-      }
-    );
-  }
-  const url = new URL(context.request.url);
-  if (context.request.headers.has("x-amz-copy-source")) {
-    const sourceName = decodeURIComponent(
-      context.request.headers.get("x-amz-copy-source")
-    );
-    console.log("sourceName", sourceName);
-    return new Response(JSON.stringify({ flag: true, message: "" }), {
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
-  if (new URLSearchParams(url.search).has("uploadId")) {
-    return onRequestPutMultipart(context);
-  }
-
-  const [bucket, path] = parseBucketPath(context);
-  if (!bucket) return notFound();
-
-  const request: Request = context.request;
-
-  let content = request.body;
-  const customMetadata: Record<string, string> = {};
-
-  if (request.headers.has("x-amz-copy-source")) {
-    const sourceName = decodeURIComponent(
-      request.headers.get("x-amz-copy-source")
-    );
-    const source = await bucket.get(sourceName);
-    content = source.body;
-    if (source.customMetadata.thumbnail)
-      customMetadata.thumbnail = source.customMetadata.thumbnail;
-  }
-
-  if (request.headers.has("fd-thumbnail"))
-    customMetadata.thumbnail = request.headers.get("fd-thumbnail");
-
-  const obj = await bucket.put(path, content, { customMetadata });
-  const { key, size, uploaded } = obj;
-  return new Response(JSON.stringify({ flag: true, key, size, uploaded }), {
-    headers: { "Content-Type": "application/json" },
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
+  return new Response(JSON.stringify({ flag: true }), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
+  // if (!get_auth_status(context)) {
+  //   return new Response(
+  //     JSON.stringify({
+  //       flag: false,
+  //       message: "么得权限",
+  //     }),
+  //     {
+  //       status: 401,
+  //       headers: {
+  //         "WWW-Authenticate": "Basic ",
+  //       },
+  //     }
+  //   );
+  // }
+
+  // const url = new URL(context.request.url);
+
+  // if (new URLSearchParams(url.search).has("uploadId")) {
+  //   return onRequestPutMultipart(context);
+  // }
+
+  // const [bucket, path] = parseBucketPath(context);
+  // if (!bucket) return notFound();
+
+  // const request: Request = context.request;
+
+  // let content = request.body;
+  // const customMetadata: Record<string, string> = {};
+
+  // if (request.headers.has("x-amz-copy-source")) {
+  //   const sourceName = decodeURIComponent(
+  //     request.headers.get("x-amz-copy-source")
+  //   );
+  //   const source = await bucket.get(sourceName);
+  //   content = source.body;
+  //   if (source.customMetadata.thumbnail)
+  //     customMetadata.thumbnail = source.customMetadata.thumbnail;
+  // }
+
+  // if (request.headers.has("fd-thumbnail"))
+  //   customMetadata.thumbnail = request.headers.get("fd-thumbnail");
+
+  // const obj = await bucket.put(path, content, { customMetadata });
+  // const { key, size, uploaded } = obj;
+  // return new Response(JSON.stringify({ flag: true, key, size, uploaded }), {
+  //   headers: { "Content-Type": "application/json" },
+  // });
 }
 
 export async function onRequestDelete(context) {

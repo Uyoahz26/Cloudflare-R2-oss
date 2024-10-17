@@ -59,7 +59,6 @@ export const transform: InterceptorHooks = {
     if (err.message === "Token check failed") {
       return Promise.reject(err);
     }
-    if (err === "noTips") return;
     useSetLoading(false);
     const mapErrorStatus = new Map([
       [400, "发出的请求有错误"],

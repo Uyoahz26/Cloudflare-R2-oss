@@ -13,6 +13,24 @@
         @load="getFileList"
         class="h-full overflow-y-scroll pl-10px mt-5px"
       >
+        <v-list-item
+          v-if="cwd"
+          :key="cwd"
+          @click="cwd = cwd.replace(/[^\/]+\/$/, '')"
+        >
+          <v-list-item-title
+            :key="cwd"
+            class="flex items-center gap-x-6px select-none"
+          >
+            <img
+              :src="getFileIcon({ path: true })"
+              :width="42"
+              alt="Image"
+              loading="lazy"
+            />
+            <p class="tracking-0.2px font-500 truncate">返回上一级..</p>
+          </v-list-item-title>
+        </v-list-item>
         <v-empty-state
           v-if="!loading && !foldersResult.length && !filesResult.length"
           title="空！！"
@@ -22,24 +40,6 @@
           tag="div"
           class="file-list grid gap-10px grid-cols-[repeat(4,_1fr)]"
         >
-          <v-list-item
-            v-if="cwd"
-            :key="cwd"
-            @click="cwd = cwd.replace(/[^\/]+\/$/, '')"
-          >
-            <v-list-item-title
-              :key="cwd"
-              class="flex items-center gap-x-6px select-none"
-            >
-              <img
-                :src="getFileIcon({ path: true })"
-                :width="42"
-                alt="Image"
-                loading="lazy"
-              />
-              <p class="tracking-0.2px font-500 truncate">返回上一级..</p>
-            </v-list-item-title>
-          </v-list-item>
           <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
           <v-list-item
             v-for="folder in foldersResult"
@@ -145,7 +145,7 @@
       </div> -->
     </div>
   </div>
-  <Upload />
+  <Upload :cwd />
   <FileAction v-model="targetFile" @delete="onDelete" @refresh="getFileList" />
 </template>
 <script lang="ts" setup>
@@ -229,11 +229,7 @@ const getFileList = async (event?): Promise<void> => {
         globalCheckToken: false,
       },
     });
-    folders.value =
-      data.folders.map((v, i) => ({
-        path: v,
-        qqID: "249609114" + --i,
-      })) ?? [];
+    folders.value = data.folders ?? [];
     files.value = data.value ?? [];
   } finally {
     loading.value = false;
