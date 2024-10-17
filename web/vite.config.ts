@@ -51,6 +51,7 @@ export default ({ mode }) => {
       preprocessorOptions: {
         scss: {
           additionalData: `@import '@/styles/base/variables.scss';`,
+          api: "modern-compiler",
         },
       },
     },
