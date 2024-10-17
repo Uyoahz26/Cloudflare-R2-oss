@@ -14,7 +14,7 @@
         class="h-full overflow-y-scroll pl-10px mt-5px"
       >
         <v-empty-state
-          v-if="!foldersResult.length && !filesResult.length"
+          v-if="!loading && !foldersResult.length && !filesResult.length"
           title="空！！"
         />
         <transition-group
@@ -122,7 +122,6 @@
           </v-list-item>
         </transition-group>
       </v-pull-to-refresh>
-
       <!-- <Progress :value="40" />
       <div>
         <span class="text-size-14px text-[#73767c]">欢迎使用系统！</span>
@@ -146,14 +145,11 @@
       </div> -->
     </div>
   </div>
-  <FileAction
-    v-model="targetFile"
-    :cwd
-    @delete="onDelete"
-    @refresh="getFileList"
-  />
+  <Upload />
+  <FileAction v-model="targetFile" @delete="onDelete" @refresh="getFileList" />
 </template>
 <script lang="ts" setup>
+import Upload from "./components/upload/upload.vue";
 import TabBar from "./components/tabBar/tabBar.vue";
 import FileAction from "./components/fileAction/file-action.vue";
 import { VPullToRefresh } from "vuetify/labs/VPullToRefresh";

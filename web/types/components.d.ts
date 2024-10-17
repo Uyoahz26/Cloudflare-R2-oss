@@ -18,6 +18,7 @@ declare module 'vue' {
     VDialog: typeof import('vuetify/components')['VDialog']
     VDivider: typeof import('vuetify/components')['VDivider']
     VEmptyState: typeof import('vuetify/components')['VEmptyState']
+    VFab: typeof import('vuetify/components')['VFab']
     VForm: typeof import('vuetify/components')['VForm']
     VIcon: typeof import('vuetify/components')['VIcon']
     VList: typeof import('vuetify/components')['VList']
@@ -27,6 +28,7 @@ declare module 'vue' {
     VMenu: typeof import('vuetify/components')['VMenu']
     VSkeletonLoader: typeof import('vuetify/components')['VSkeletonLoader']
     VSpacer: typeof import('vuetify/components')['VSpacer']
+    VSpeedDial: typeof import('vuetify/components')['VSpeedDial']
     VTextField: typeof import('vuetify/components')['VTextField']
   }
 }

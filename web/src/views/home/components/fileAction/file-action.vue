@@ -2,7 +2,14 @@
   <v-bottom-sheet v-model="showSheet" inset class="select-none">
     <v-list>
       <div class="flex flex-col items-center mb-20px" v-if="showSheet">
-        <img class="my-10px" :src="getFileIcon(targetFile)" width="100" />
+        <img
+          class="my-10px"
+          :src="getFileIcon(targetFile)"
+          width="100"
+          :style="{
+            animation: showSheet ? 'imgShadow 2s infinite alternate' : 'none',
+          }"
+        />
         <v-chip
           color="primary"
           label
@@ -102,15 +109,13 @@
   </v-dialog>
 </template>
 <script setup lang="ts">
+import { ThemeColor } from "@/utils/colorTheme";
 import { getFileIcon, msgs } from "@/utils/help";
 import { Action, FileActions } from "../../types";
 import { del, put } from "@/hooks/useRequest";
 defineOptions({
   name: "FileAction",
 });
-const props = defineProps<{
-  cwd: string;
-}>();
 const emit = defineEmits(["delete", "refresh"]);
 const targetFile = defineModel() as Ref<Record<string, any> | null>;
 
@@ -127,7 +132,32 @@ const fileName = computed(() =>
   targetFile.value?.key.split("/").pop().split(".").shift()
 );
 const showSheet = computed({
-  get: () => !!targetFile.value,
+  get: () => {
+    if (!!targetFile.value) {
+      nextTick(() => {
+        new ThemeColor(getFileIcon(targetFile.value), (_, color) => {
+          console.log("color: ", color);
+          const styleSheet =
+            document.styleSheets[document.styleSheets.length - 1];
+          const keyframes = `
+            @keyframes imgShadow {
+              0% {
+                filter: drop-shadow(0px 0px 1px white);
+              }
+              100% {
+                transform: scale(1.003);
+                filter: drop-shadow(2px 4px 6px ${color});
+              }
+            }
+          `;
+
+          // 将 keyframes 插入到样式表中
+          styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
+        });
+      });
+    }
+    return !!targetFile.value;
+  },
   set: (value) => {
     if (!value) {
       targetFile.value = null;
