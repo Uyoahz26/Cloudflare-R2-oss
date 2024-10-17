@@ -3,7 +3,11 @@
     <v-list>
       <div class="flex flex-col items-center mb-20px" v-if="showSheet">
         <img class="my-10px" :src="getFileIcon(targetFile)" width="100" />
-        <v-chip color="primary" label class="px-8px! h-26px!">
+        <v-chip
+          color="primary"
+          label
+          class="px-8px! py-3px! h-auto! mx-10px! whitespace-break-spaces!"
+        >
           <span class="font-bold">
             {{ targetFile?.key ?? targetFile?.path }}</span
           >
@@ -21,7 +25,7 @@
           :class="{
             'text-red-500': action.value === 'delete',
           }"
-          @click="handleFileAction(action.value)"
+          @click="processFileAction(action.value)"
         >
           <v-icon size="x-small" :icon="action.icon"></v-icon>
           {{ action.text }}
@@ -37,27 +41,45 @@
       </v-list-item>
     </v-list>
   </v-bottom-sheet>
-  <v-dialog v-model="deleteDialog" width="auto">
+  <v-dialog v-model="dialogShow" width="auto" :persistent="loading">
     <v-card
       :loading
-      width="400"
+      width="400px"
       class="px-10px!"
-      prepend-icon="fa-exclamation-triangle"
+      :prepend-icon="
+        DeleteFlag ? 'fa-exclamation-triangle' : 'fa-pencil-square-o'
+      "
       title=""
     >
       <template #text>
-        <div class="text-center">
-          确定要删除
-          <v-chip color="red" label class="px-8px! h-26px!">
+        <div v-if="DeleteFlag" class="flex items-center">
+          确定要删除<v-chip
+            color="red"
+            label
+            class="px-8px! py-3px! h-auto! whitespace-break-spaces!"
+          >
             <span class="font-bold">
               {{
                 targetFile?.key ??
                 targetFile?.path.split("/").filter(Boolean).pop()
               }}</span
-            >
-          </v-chip>
-          吗？
+            > </v-chip
+          >吗？
         </div>
+        <v-text-field
+          v-else
+          ref="renameRef"
+          v-model="rename.name"
+          :loading
+          :required="true"
+          :rules="[
+            (v) => !!v || '文件名必填!',
+            (v) => /^[a-zA-Z0-9_.-]+$/.test(v) || '文件名不能包含特殊字符!',
+            (v) => fileName !== v || '新名称不能与旧名称相同!',
+          ]"
+          :suffix="rename.suffix"
+          label="文件名"
+        />
       </template>
       <template #actions>
         <v-btn
@@ -65,7 +87,7 @@
           text="取消"
           variant="plain"
           size="small"
-          @click="deleteDialog = false"
+          @click="dialogShow = false"
         ></v-btn>
         <v-btn
           :loading
@@ -73,7 +95,7 @@
           text="确定"
           variant="tonal"
           size="small"
-          @click="deleteFile"
+          @click="(DeleteFlag ? deleteFile : handleFileRename)()"
         ></v-btn>
       </template>
     </v-card>
@@ -82,19 +104,28 @@
 <script setup lang="ts">
 import { getFileIcon, msgs } from "@/utils/help";
 import { Action, FileActions } from "../../types";
-import { del } from "@/hooks/useRequest";
+import { del, put } from "@/hooks/useRequest";
 defineOptions({
   name: "FileAction",
 });
-
-const emit = defineEmits(["delete"]);
-
-const loading = ref(false);
-
+const props = defineProps<{
+  cwd: string;
+}>();
+const emit = defineEmits(["delete", "refresh"]);
 const targetFile = defineModel() as Ref<Record<string, any> | null>;
 
-const deleteDialog = ref(false);
+const loading = ref(false);
+const dialogShow = ref(false);
+const DeleteFlag = ref(false);
+const renameRef = ref();
+const rename = ref({
+  name: "",
+  suffix: "",
+});
 
+const fileName = computed(() =>
+  targetFile.value?.key.split("/").pop().split(".").shift()
+);
 const showSheet = computed({
   get: () => !!targetFile.value,
   set: (value) => {
@@ -103,7 +134,6 @@ const showSheet = computed({
     }
   },
 });
-
 const fileOptions = computed<FileActions>(() => {
   const publicMethod: FileActions = [
     {
@@ -134,12 +164,33 @@ const fileOptions = computed<FileActions>(() => {
   return publicMethod;
 });
 
-const handleFileAction = (action: Action) => {
-  console.log("action: ", action);
-  console.log("targetFile.value", targetFile.value);
+const processFileAction = (action: Action): void => {
   switch (action) {
+    case "copyLink":
+      handleCopyLink();
+      break;
+    case "rename":
+      const fileSplit = targetFile.value?.key.split("/").pop().split(".");
+      const fileSuffix = "." + fileSplit.pop();
+      Object.assign(rename.value, {
+        suffix: fileSuffix,
+        name: fileSplit.join("."),
+      });
+      DeleteFlag.value = false;
+      dialogShow.value = true;
+      break;
+    case "download":
+      const downloadUrl = `/raw/${targetFile.value?.key}`;
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.setAttribute("download", targetFile.value?.key.split("/").pop());
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      break;
     case "delete":
-      deleteDialog.value = true;
+      DeleteFlag.value = true;
+      dialogShow.value = true;
       break;
 
     default:
@@ -147,7 +198,41 @@ const handleFileAction = (action: Action) => {
   }
 };
 
-const deleteFile = async () => {
+const handleCopyLink = (): void => {
+  const { key, path } = targetFile.value ?? {};
+  const link = key ? `/raw/${key}` : `/?p=${encodeURIComponent(path)}`;
+  const url = new URL(link, window.location.origin);
+  navigator.clipboard.writeText(url.toString());
+  msgs("已复制链接到剪贴板");
+};
+
+const handleFileRename = async (): Promise<void> => {
+  const validate = await renameRef.value?.validate();
+  if (validate.length) return;
+  loading.value = true;
+  try {
+    const fileType = targetFile.value?.key.split(".").pop();
+    await put(`/api/write/items/${rename.value.name}.${fileType}`, "", {
+      headers: {
+        "x-amz-copy-source": encodeURIComponent(targetFile.value?.key),
+      },
+    });
+    await del(`/api/write/items/${targetFile.value?.key}`, {
+      requestOptions: {
+        globalSuccessMessage: `我重生了,这一世我叫【${rename.value.name}】`,
+      },
+    });
+    loading.value = false;
+    dialogShow.value = false;
+    targetFile.value = null;
+    emit("refresh");
+  } catch (error) {
+    console.log("rename error: ", error);
+    loading.value = false;
+  }
+};
+
+const deleteFile = async (): Promise<void> => {
   const key = targetFile.value?.key ?? targetFile.value?.path;
   if (!key) return;
   loading.value = true;
@@ -158,11 +243,18 @@ const deleteFile = async () => {
       },
     });
     loading.value = false;
-    deleteDialog.value = false;
+    dialogShow.value = false;
     emit("delete", targetFile.value);
     targetFile.value = null;
-  } catch {
+  } catch (e) {
     loading.value = false;
   }
 };
 </script>
+<style lang="scss" scoped>
+@media only screen and (max-width: 768px) {
+  .v-card {
+    width: 80vw !important;
+  }
+}
+</style>

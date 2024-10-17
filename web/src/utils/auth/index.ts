@@ -1,9 +1,11 @@
 import { useCommonStore } from "@/stores/modules/common";
 import { router } from "@/routers";
+import { msgs } from "../help";
 
 export const checkout = async (): Promise<void> => {
   useCommonStore().$reset();
-  router.replace("/");
+  msgs("无权限，先登录", "error");
+  // router.replace("/");
 };
 
 export const checkToken = (): Promise<void> => {

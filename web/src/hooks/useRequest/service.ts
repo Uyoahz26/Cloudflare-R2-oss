@@ -12,15 +12,17 @@ export const transform: InterceptorHooks = {
   requestInterceptor(config) {
     const options = config["requestOptions"] as RequestOptions;
 
+    if (options?.globalCheckToken) {
+      const token = getToken();
+      if (!token) {
+        checkout();
+        throw new Error("Token check failed");
+      } else {
+        config!.headers!.Authorization = "Basic " + token;
+      }
+    }
     if (options?.globalLoading) {
       useSetLoading(true);
-    }
-    if (options?.globalCheckToken) {
-      checkToken()
-        .then(() => {
-          config!.headers!.Authorization = "Basic " + getToken();
-        })
-        .catch(checkout);
     }
     return config;
   },
@@ -54,6 +56,10 @@ export const transform: InterceptorHooks = {
     return data;
   },
   responseInterceptorCatch(err) {
+    if (err.message === "Token check failed") {
+      return Promise.reject(err);
+    }
+    if (err === "noTips") return;
     useSetLoading(false);
     const mapErrorStatus = new Map([
       [400, "发出的请求有错误"],

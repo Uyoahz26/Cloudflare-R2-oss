@@ -48,17 +48,6 @@
             <v-icon size="x-small" :icon="item.icon"></v-icon>
           </v-list-item-title>
         </v-list-item>
-        <v-divider></v-divider>
-        <v-list-item-title>
-          <v-btn
-            density="compact"
-            variant="text"
-            class="mt-10px"
-            block
-            @click="sortWay = null"
-            >重置</v-btn
-          >
-        </v-list-item-title>
       </v-list>
     </v-menu>
   </div>

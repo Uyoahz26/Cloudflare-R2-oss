@@ -5,7 +5,7 @@
         <v-form ref="formRef" validate-on="submit lazy">
           <v-text-field
             v-model="formValue.name"
-            :counter="10"
+            :counter="20"
             :rules="[(v) => !!v || '用户名必填!']"
             label="用户名"
             required
@@ -85,6 +85,7 @@ const submitForm = async (): Promise<void> => {
     {
       requestOptions: {
         globalSuccessMessage: "登录成功",
+        globalCheckToken: false,
       },
     }
   );

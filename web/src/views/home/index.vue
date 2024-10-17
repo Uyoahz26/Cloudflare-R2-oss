@@ -6,16 +6,15 @@
       @update:keyword="searchKey = $event.trim().toLowerCase()"
     />
     <div
-      class="bg-[#fff] rounded-4px mb-5px p-10px flex-1 max-h-[calc(100vh-50px)] overflow-y-scroll"
+      class="bg-[#fff] rounded-4px flex-1 max-h-[calc(100vh-55px)] overflow-hidden"
     >
       <v-pull-to-refresh
         :pull-down-threshold="66"
         @load="getFileList"
-        class="h-full"
+        class="h-full overflow-y-scroll pl-10px mt-5px"
       >
-        <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
         <v-empty-state
-          v-else-if="!foldersResult.length && !filesResult.length"
+          v-if="!foldersResult.length && !filesResult.length"
           title="空！！"
         />
         <transition-group
@@ -24,10 +23,29 @@
           class="file-list grid gap-10px grid-cols-[repeat(4,_1fr)]"
         >
           <v-list-item
-            v-for="(folder, index) in foldersResult"
+            v-if="cwd"
+            :key="cwd"
+            @click="cwd = cwd.replace(/[^\/]+\/$/, '')"
+          >
+            <v-list-item-title
+              :key="cwd"
+              class="flex items-center gap-x-6px select-none"
+            >
+              <img
+                :src="getFileIcon({ path: true })"
+                :width="42"
+                alt="Image"
+                loading="lazy"
+              />
+              <p class="tracking-0.2px font-500 truncate">返回上一级..</p>
+            </v-list-item-title>
+          </v-list-item>
+          <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
+          <v-list-item
+            v-for="folder in foldersResult"
             :key="folder.path"
             :value="folder.path"
-            @click.self
+            @click="cwd = folder.path"
           >
             <v-list-item-title
               class="flex items-center gap-x-6px select-none relative"
@@ -69,10 +87,9 @@
             </v-list-item-title>
           </v-list-item>
           <v-list-item
-            v-for="(file, index) in filesResult"
+            v-for="file in filesResult"
             :key="file.key"
             :value="file.key"
-            @click="files.splice(index, 1)"
           >
             <v-list-item-title
               class="flex items-center gap-x-6px select-none relative"
@@ -88,7 +105,7 @@
                 <p class="file-list-name">{{ file.key.split("/").pop() }}</p>
                 <div class="text-[#8d8d8d] text-0.8em tracking-0.3px">
                   <span>{{ new Date(file.uploaded).toLocaleString() }}</span>
-                  <span v-text="formatSize(file.size)"></span>
+                  <span class="ml-10px">{{ formatSize(file.size) }}</span>
                 </div>
               </div>
               <div class="absolute right-1 hidden file-more-action">
@@ -129,7 +146,12 @@
       </div> -->
     </div>
   </div>
-  <FileAction v-model="targetFile" @delete="onDelete" />
+  <FileAction
+    v-model="targetFile"
+    :cwd
+    @delete="onDelete"
+    @refresh="getFileList"
+  />
 </template>
 <script lang="ts" setup>
 import TabBar from "./components/tabBar/tabBar.vue";
@@ -139,25 +161,42 @@ import Progress from "./components/progress/progress.vue";
 import { get } from "@/hooks/useRequest";
 
 import { getFileIcon, formatSize } from "@/utils/help";
-import { useGetLoading } from "@/hooks/useLoading";
 import { useCommonStore } from "@/stores/modules/common";
 
 const store = useCommonStore();
 
-const loading = useGetLoading();
-const sortWay = ref(null);
+const loading = ref(false);
+const sortWay = ref();
 const dialog = ref(false);
+const targetFile = ref();
+const cwd = ref("");
 const searchKey = ref("");
 const deletingFlag = ref(false);
-const targetFile = ref();
 const files = ref<Record<string, string>[]>([]);
 const folders = ref<Record<string, string>[]>([]);
 
 const filesResult = computed(() => {
-  if (!searchKey.value) return files.value;
-  return files.value.filter((item) =>
-    item.key.toLowerCase().includes(searchKey.value)
-  );
+  let resultFiles = files.value;
+  if (searchKey.value) {
+    resultFiles = files.value;
+    files.value.filter((item) =>
+      item.key.toLowerCase().includes(searchKey.value)
+    );
+  }
+  if (sortWay.value?.value) {
+    const sortKey = sortWay.value.value;
+    resultFiles.sort((a, b) => {
+      switch (sortKey) {
+        case "smallToBig":
+          return +a.size - +b.size;
+        case "bigToSmall":
+          return +b.size - +a.size;
+        default:
+          return a.key.localeCompare(b.key);
+      }
+    });
+  }
+  return resultFiles;
 });
 const foldersResult = computed(() => {
   console.log("searchKey.value: ", searchKey.value);
@@ -167,14 +206,43 @@ const foldersResult = computed(() => {
   );
 });
 
+watch(
+  () => cwd.value,
+  () => {
+    getFileList();
+    const url = new URL(window.location.href);
+    if ((url.searchParams.get("p") || "") !== cwd.value) {
+      cwd.value
+        ? url.searchParams.set("p", cwd.value)
+        : url.searchParams.delete("p");
+      window.history.pushState(null, "", url.toString());
+    }
+    document.title = `${cwd.value.replace(/.*\/(?!$)|\//g, "") || "/"} - 文件库`;
+  }
+);
+
 const getFileList = async (event?): Promise<void> => {
   folders.value.length = 0;
   files.value.length = 0;
-  const data = await get("/api/children");
-  console.log("data: ", data);
-  folders.value = data.folders ?? [];
-  files.value = data.value ?? [];
-  event?.done();
+  loading.value = true;
+  try {
+    // const data = await get("/api/children");
+    const data = await get(`/api/children${cwd.value ? "/" + cwd.value : ""}`, {
+      requestOptions: {
+        globalRawData: true,
+        globalCheckToken: false,
+      },
+    });
+    folders.value =
+      data.folders.map((v, i) => ({
+        path: v,
+        qqID: "249609114" + --i,
+      })) ?? [];
+    files.value = data.value ?? [];
+  } finally {
+    loading.value = false;
+    event?.done();
+  }
 };
 getFileList();
 

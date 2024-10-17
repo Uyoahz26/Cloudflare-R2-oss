@@ -104,6 +104,15 @@ export async function onRequestPut(context) {
     );
   }
   const url = new URL(context.request.url);
+  if (context.request.headers.has("x-amz-copy-source")) {
+    const sourceName = decodeURIComponent(
+      context.request.headers.get("x-amz-copy-source")
+    );
+    console.log("sourceName", sourceName);
+    return new Response(JSON.stringify({ flag: true, message: "" }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 
   if (new URLSearchParams(url.search).has("uploadId")) {
     return onRequestPutMultipart(context);
