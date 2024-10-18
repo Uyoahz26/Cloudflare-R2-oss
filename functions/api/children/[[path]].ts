@@ -4,6 +4,7 @@ import { AccountMapping } from "../login";
 export async function onRequestGet(context) {
   try {
     const [bucket, path] = parseBucketPath(context);
+    console.log("path: ", path);
     const prefix = path && `${path}/`;
     if (!bucket || prefix.startsWith("_$flaredrive$/")) return notFound();
 

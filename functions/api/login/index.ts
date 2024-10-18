@@ -11,7 +11,6 @@ export const AccountMapping = {
 
 export async function onRequestPost(context) {
   const resqBody = await context.request.json();
-  console.log("resqBody: ", resqBody);
   let loginChar = "";
   const LoginFail = new Response(
     JSON.stringify({
@@ -36,9 +35,6 @@ export async function onRequestPost(context) {
 
   const accountKey = loginChar.slice(0, loginChar.indexOf(":")).toLowerCase();
   const QQID = AccountMapping[accountKey];
-  context.env = {
-    "admin:admin": "*",
-  };
   return new Response(
     JSON.stringify({
       flag: true,
