@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 export interface CommonState {
   token: string;
   QQ: string;
+  allowFolder: string[];
 }
 
 export const useCommonStore = defineStore("uyoahzOSS", {
@@ -9,6 +10,7 @@ export const useCommonStore = defineStore("uyoahzOSS", {
     return {
       token: "",
       QQ: "",
+      allowFolder: [],
     };
   },
   persist: {

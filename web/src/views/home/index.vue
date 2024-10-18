@@ -40,7 +40,7 @@
           tag="div"
           class="file-list grid gap-10px grid-cols-[repeat(4,_1fr)]"
         >
-          <v-skeleton-loader v-if="loading" type="article"></v-skeleton-loader>
+          <v-skeleton-loader v-if="loading" type="article" />
           <v-list-item
             v-for="folder in foldersResult"
             :key="folder.path"
@@ -122,51 +122,28 @@
           </v-list-item>
         </transition-group>
       </v-pull-to-refresh>
-      <!-- <Progress :value="40" />
-      <div>
-        <span class="text-size-14px text-[#73767c]">欢迎使用系统！</span>
-        <v-btn variant="tonal"> Button </v-btn>
-      </div>
-      <div class="text-center pa-4">
-        <v-btn @click="dialog = true"> Open Dialog </v-btn>
-
-        <v-dialog v-model="dialog" width="auto">
-          <v-card
-            max-width="400"
-            prepend-icon="mdi-update"
-            text="Your application will relaunch automatically after the update is complete."
-            title="Update in progress"
-          >
-            <template v-slot:actions>
-              <v-btn class="ms-auto" text="Ok" @click="dialog = false"></v-btn>
-            </template>
-          </v-card>
-        </v-dialog>
-      </div> -->
     </div>
   </div>
-  <Upload :cwd />
+  <Upload :cwd :folders="foldersResult" @refresh="getFileList" />
   <FileAction v-model="targetFile" @delete="onDelete" @refresh="getFileList" />
 </template>
 <script lang="ts" setup>
 import Upload from "./components/upload/upload.vue";
 import TabBar from "./components/tabBar/tabBar.vue";
 import FileAction from "./components/fileAction/file-action.vue";
-import { VPullToRefresh } from "vuetify/labs/VPullToRefresh";
-import Progress from "./components/progress/progress.vue";
 import { get } from "@/hooks/useRequest";
+import { VPullToRefresh } from "vuetify/labs/VPullToRefresh";
 
 import { getFileIcon, formatSize } from "@/utils/help";
 import { useCommonStore } from "@/stores/modules/common";
 
 const store = useCommonStore();
 
-const loading = ref(false);
+const cwd = ref(new URL(window.location.href).searchParams.get("p") || "");
 const sortWay = ref();
-const dialog = ref(false);
 const targetFile = ref();
-const cwd = ref("");
 const searchKey = ref("");
+const loading = ref(false);
 const deletingFlag = ref(false);
 const files = ref<Record<string, string>[]>([]);
 const folders = ref<Record<string, string>[]>([]);
@@ -195,7 +172,6 @@ const filesResult = computed(() => {
   return resultFiles;
 });
 const foldersResult = computed(() => {
-  console.log("searchKey.value: ", searchKey.value);
   if (!searchKey.value) return folders.value;
   return folders.value.filter((item) =>
     item.path.toLowerCase().includes(searchKey.value)
@@ -217,12 +193,19 @@ watch(
   }
 );
 
+onMounted(() => {
+  window.addEventListener("popstate", popstateFunc);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("popstate", popstateFunc);
+});
+
 const getFileList = async (event?): Promise<void> => {
   folders.value.length = 0;
   files.value.length = 0;
   loading.value = true;
   try {
-    // const data = await get("/api/children");
     const data = await get(`/api/children${cwd.value ? "/" + cwd.value : ""}`, {
       requestOptions: {
         globalRawData: true,
@@ -251,6 +234,13 @@ const onDelete = (target): void => {
   setTimeout(() => {
     deletingFlag.value = false;
   }, 400);
+};
+
+const popstateFunc = () => {
+  const searchParams = new URL(window.location.href).searchParams;
+  if (searchParams.get("p") !== cwd.value) {
+    cwd.value = searchParams.get("p") || "";
+  }
 };
 </script>
 <style lang="scss" scoped>

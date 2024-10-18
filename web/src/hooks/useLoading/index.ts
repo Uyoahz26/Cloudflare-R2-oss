@@ -1,7 +1,9 @@
 const show = ref(false);
+let countLoading = 0;
 
 export function useSetLoading(state: boolean): void {
-  show.value = state;
+  countLoading = unref(state) ? countLoading + 1 : countLoading - 1;
+  show.value = countLoading > 0;
 }
 
 export function useGetLoading(): Ref<boolean> {

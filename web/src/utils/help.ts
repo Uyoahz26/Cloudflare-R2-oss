@@ -36,7 +36,7 @@ export function getFileIcon(filtInfo) {
     return `/raw/_$flaredrive$/thumbnails/${customMetadata?.thumbnail}.png`;
   }
   let mimeType = httpMetadata?.contentType;
-  if (!mimeType) {
+  if (!mimeType && key) {
     const TypeMapping = {
       js: "application/javascript",
       html: "text/html",

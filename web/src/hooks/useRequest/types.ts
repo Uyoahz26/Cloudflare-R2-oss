@@ -17,6 +17,7 @@ export interface RequestOptions {
   globalCheckToken?: boolean;
   globalLoading?: boolean;
   globalRawData?: boolean;
+  globalReturnHeaders?: boolean;
 }
 
 export interface ExpandAxiosRequestConfig<D = any>

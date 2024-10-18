@@ -48,6 +48,9 @@ export const transform: InterceptorHooks = {
       msgs(data.message, "error");
       return Promise.reject(data);
     }
+    if (requestOptions?.globalReturnHeaders) {
+      data.headers = res?.headers ?? {};
+    }
 
     const successMsg = requestOptions?.globalSuccessMessage;
     successMsg &&
@@ -60,6 +63,9 @@ export const transform: InterceptorHooks = {
       return Promise.reject(err);
     }
     useSetLoading(false);
+    if (!err.config.requestOptions?.globalErrorMessage) {
+      return Promise.reject(err);
+    }
     const mapErrorStatus = new Map([
       [400, "发出的请求有错误"],
       [401, "么得权限"],

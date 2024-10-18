@@ -68,8 +68,8 @@ const loading = useGetLoading();
 
 const formRef = ref();
 const formValue = ref({
-  name: "admin",
-  password: "admin",
+  name: "",
+  password: "",
 });
 
 const submitForm = async (): Promise<void> => {
@@ -99,14 +99,13 @@ const submitForm = async (): Promise<void> => {
 
 const handleClose = async (): Promise<void> => {
   dialog.value = false;
-  // formValue.value = {
-  //   name: "",
-  //   password: "",
-  // };
+  formValue.value = {
+    name: "",
+    password: "",
+  };
 };
 
 const handleExit = () => {
-  console.log("useGoogleLocationService");
   useCommonStore().$reset();
   exitDialog.value = false;
 };

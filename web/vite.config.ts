@@ -57,7 +57,7 @@ export default ({ mode }) => {
     },
     server: {
       host: true,
-      port: 10000,
+      port: 12138,
       proxy: {
         "/api": {
           // target: "https://uyoahz.site",
