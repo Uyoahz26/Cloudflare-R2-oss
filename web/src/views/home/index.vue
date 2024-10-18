@@ -31,6 +31,7 @@
             <p class="tracking-0.2px font-500 truncate">返回上一级..</p>
           </v-list-item-title>
         </v-list-item>
+        <v-skeleton-loader v-if="loading" type="article" />
         <v-empty-state
           v-if="!loading && !foldersResult.length && !filesResult.length"
           title="空！！"
@@ -40,7 +41,6 @@
           tag="div"
           class="file-list grid gap-10px grid-cols-[repeat(4,_1fr)]"
         >
-          <v-skeleton-loader v-if="loading" type="article" />
           <v-list-item
             v-for="folder in foldersResult"
             :key="folder.path"
