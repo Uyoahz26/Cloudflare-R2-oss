@@ -22,7 +22,7 @@ export async function onRequestGet(context) {
     let folders = objList.delimitedPrefixes.map((v) => ({ path: v }));
     if (!path) {
       folders = folders
-        .filter((folder) => folder !== "_$flaredrive$/")
+        .filter((v) => v.path !== "_$flaredrive$/")
         .map((v) => ({
           ...v,
           qqID: AccountMapping[v.path.split("/")[0].toLowerCase()],
