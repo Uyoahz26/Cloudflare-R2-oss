@@ -2,9 +2,6 @@ main = "functions/index.ts"
 name = "uyoahz-oss"
 compatibility_date = "2024-10-19"
 
-# Cloudflare Workers script location
-script = "dist/index.js"
-
 # For API requests
 [[routes]]
 pattern = "uyoahz.site/api/*"
