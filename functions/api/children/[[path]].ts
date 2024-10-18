@@ -4,7 +4,6 @@ import { AccountMapping } from "../login";
 export async function onRequestGet(context) {
   try {
     const [bucket, path] = parseBucketPath(context);
-    console.log("path: ", path);
     const prefix = path && `${path}/`;
     if (!bucket || prefix.startsWith("_$flaredrive$/")) return notFound();
 
@@ -20,13 +19,13 @@ export async function onRequestGet(context) {
         return { key, size, uploaded, httpMetadata, customMetadata };
       });
 
-    let folders = objList.delimitedPrefixes;
+    let folders = objList.delimitedPrefixes.map((v) => ({ path: v }));
     if (!path) {
       folders = folders
         .filter((folder) => folder !== "_$flaredrive$/")
         .map((v) => ({
-          path: v,
-          qqID: AccountMapping[v.split("/")[0]],
+          ...v,
+          qqID: AccountMapping[v.path.split("/")[0].toLowerCase()],
         }));
     }
 

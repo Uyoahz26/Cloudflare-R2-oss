@@ -1,7 +1,7 @@
 import { get_auth_status } from "@/utils/auth";
 
 export const AccountMapping = {
-  admin: "2496091142",
+  zhaoyu: "2496091142",
   uyoahz: "2496091142",
   tina: "1478367130",
   zhaoyuxuan: "1812028206",
