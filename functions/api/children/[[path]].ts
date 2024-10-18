@@ -22,13 +22,13 @@ export async function onRequestGet(context) {
 
     let folders = objList.delimitedPrefixes;
     if (!path) {
-      folders = folders.filter((folder) => folder !== "_$flaredrive$/");
+      folders = folders
+        .filter((folder) => folder !== "_$flaredrive$/")
+        .map((v) => ({
+          path: v,
+          qqID: AccountMapping[v.split("/")[0]],
+        }));
     }
-
-    folders.map((v) => ({
-      path: v,
-      qqID: AccountMapping[v.split("/")[0]],
-    }));
 
     return new Response(
       JSON.stringify({ value: objKeys, folders, flag: true }),
