@@ -13,11 +13,6 @@
         @load="getFileList"
         class="h-full overflow-y-scroll pl-10px mt-5px"
       >
-        <v-skeleton-loader v-if="loading" type="article" />
-        <v-empty-state
-          v-if="!loading && !foldersResult.length && !filesResult.length"
-          title="空！！"
-        />
         <transition-group
           :name="deletingFlag ? 'fileList' : ''"
           tag="div"
@@ -25,7 +20,7 @@
         >
           <v-list-item
             v-if="cwd"
-            :key="cwd"
+            :key="cwd + 'back'"
             @click="cwd = cwd.replace(/[^\/]+\/$/, '')"
           >
             <v-list-item-title
@@ -41,6 +36,26 @@
               <p class="tracking-0.2px font-500 truncate">返回上一级..</p>
             </v-list-item-title>
           </v-list-item>
+          <v-skeleton-loader
+            v-if="loading"
+            :key="cwd + 'skeleton'"
+            class="grid-spanning-four-columns"
+            type="article"
+          />
+          <v-empty-state
+            v-if="!loading && !foldersResult.length && !filesResult.length"
+            :key="cwd + 'empty'"
+            class="grid-spanning-four-columns"
+          >
+            <div class="text-center">
+              <img :src="Empty" class="w-8em" alt="" />
+              <p
+                class="text-center text-15px font-500 text-#969696 tracking-1px font-italic"
+              >
+                好空~ 像我的钱包一样……
+              </p>
+            </div>
+          </v-empty-state>
           <v-list-item
             v-for="folder in foldersResult"
             :key="folder.path"
@@ -128,6 +143,7 @@
   <FileAction v-model="targetFile" @delete="onDelete" @refresh="getFileList" />
 </template>
 <script lang="ts" setup>
+import Empty from "@/assets/images/empty.gif";
 import Upload from "./components/upload/upload.vue";
 import TabBar from "./components/tabBar/tabBar.vue";
 import FileAction from "./components/fileAction/file-action.vue";
@@ -244,10 +260,16 @@ const popstateFunc = () => {
 };
 </script>
 <style lang="scss" scoped>
+.grid-spanning-four-columns {
+  grid-column-start: span 4;
+}
 @media only screen and (max-width: 768px) {
   .file-list {
     padding-bottom: 90px;
     grid-template-columns: none;
+    .grid-spanning-four-columns {
+      grid-column-start: unset;
+    }
     .file-more-action {
       display: block;
     }
